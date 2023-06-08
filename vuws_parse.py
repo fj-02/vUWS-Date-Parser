@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from ics import Calendar, Event
-from datetime import datetime, timezone
+from datetime import datetime
 import io, sys, re
 
 # Gotten from vUWS site
@@ -15,7 +15,6 @@ def open_html():
 	if not file_name.endswith(".html"):
 		print("Not a HTML file")
 		exit(1)
-
 	try:
 		file = open(file_name, "r")
 		return file
@@ -57,10 +56,10 @@ def parse_file(file: io.TextIOWrapper) -> list:
 	return subject_name, events
 
 def safe_file_name(name):
-	safe_name = re.sub(r'[<>:"/\\|?*]', '', name)
-	safe_name = safe_name.strip()
-	safe_name = safe_name[:255]
-	return safe_name
+	name = re.sub(r'[<>:"/\\|?*]', "", name)
+	name = name.strip()
+	name = name[:255]
+	return name
 
 def gen_dates(subject_name: str, events: list):
 	cal = Calendar()
@@ -85,8 +84,11 @@ def gen_dates(subject_name: str, events: list):
 		file.writelines(cal.serialize_iter())
 	print(f"{file_name} saved")
 
-if __name__ == '__main__':
-	file = open_html()
-	subject_name, events = parse_file(file)
-	file.close()
-	gen_dates(subject_name, events)
+if __name__ == "__main__":
+	try:
+		file = open_html()
+		subject_name, events = parse_file(file)
+		file.close()
+		gen_dates(subject_name, events)
+	except KeyboardInterrupt:
+		print("\nExiting")
